@@ -499,6 +499,11 @@ type ProtocolBugs struct {
 	// BadRenegotiationInfo causes the renegotiation extension value in a
 	// renegotiation handshake to be incorrect.
 	BadRenegotiationInfo bool
+
+	// RSAEphemeralKey, if true, causes the server to send a
+	// ServerKeyExchange message containing an ephemeral key (as in
+	// RSA_EXPORT) in the plain RSA key exchange.
+	RSAEphemeralKey bool
 }
 
 func (c *Config) serverInit() {
