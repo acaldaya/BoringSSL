@@ -954,7 +954,7 @@ uint8_t *ssl_add_clienthello_tlsext(SSL *s, uint8_t *buf, uint8_t *limit,
     }
   }
 
-  if (ssl3_version_from_wire(s, s->client_version) >= TLS1_2_VERSION) {
+  if (SSL_CLIENT_USE_TLS1_2_CIPHERS(s)) {
     size_t salglen;
     const uint8_t *salg;
     salglen = tls12_get_psigalgs(s, &salg);
