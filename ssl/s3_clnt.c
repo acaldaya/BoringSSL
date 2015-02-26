@@ -1293,55 +1293,7 @@ int ssl3_get_server_key_exchange(SSL *s)
 			}
 		}
 
-	if (alg_k & SSL_kRSA)
-		{
-		CBS rsa_modulus, rsa_exponent;
-
-		/* TODO(davidben): This was originally for export
-		 * reasons. Do we still need to support it? */
-
-		if (!CBS_get_u16_length_prefixed(&server_key_exchange, &rsa_modulus) ||
-			CBS_len(&rsa_modulus) == 0 ||
-			!CBS_get_u16_length_prefixed(&server_key_exchange, &rsa_exponent) ||
-			CBS_len(&rsa_exponent) == 0)
-			{
-			al = SSL_AD_DECODE_ERROR;
-			OPENSSL_PUT_ERROR(SSL, ssl3_get_server_key_exchange, SSL_R_DECODE_ERROR);
-			goto f_err;
-			}
-
-		if ((rsa=RSA_new()) == NULL)
-			{
-			OPENSSL_PUT_ERROR(SSL, ssl3_get_server_key_exchange, ERR_R_MALLOC_FAILURE);
-			goto err;
-			}
-
-		if (!(rsa->n = BN_bin2bn(CBS_data(&rsa_modulus),
-					CBS_len(&rsa_modulus), rsa->n)))
-			{
-			OPENSSL_PUT_ERROR(SSL, ssl3_get_server_key_exchange, ERR_R_BN_LIB);
-			goto err;
-			}
-
-		if (!(rsa->e = BN_bin2bn(CBS_data(&rsa_exponent),
-					CBS_len(&rsa_exponent), rsa->e)))
-			{
-			OPENSSL_PUT_ERROR(SSL, ssl3_get_server_key_exchange, ERR_R_BN_LIB);
-			goto err;
-			}
-
-		/* this should be because we are using an export cipher */
-		if (alg_a & SSL_aRSA)
-			pkey=X509_get_pubkey(s->session->sess_cert->peer_pkeys[SSL_PKEY_RSA_ENC].x509);
-		else
-			{
-			OPENSSL_PUT_ERROR(SSL, ssl3_get_server_key_exchange, ERR_R_INTERNAL_ERROR);
-			goto err;
-			}
-		s->session->sess_cert->peer_rsa_tmp=rsa;
-		rsa=NULL;
-		}
-	else if (alg_k & SSL_kEDH)
+	if (alg_k & SSL_kEDH)
 		{
 		CBS dh_p, dh_g, dh_Ys;
 
